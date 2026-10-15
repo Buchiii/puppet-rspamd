@@ -15,15 +15,18 @@
 # @author Bernhard Frauendienst <puppet@nospam.obeliks.de>
 #
 define rspamd::ucl::file (
-  Stdlib::Absolutepath $file        = $title,
-  Optional[String] $comment         = undef,
-  Enum['present', 'absent'] $ensure = 'present',
+  Stdlib::Absolutepath $file         = $title,
+  Optional[String] $comment          = undef,
+  Enum['present', 'absent'] $ensure  = 'present',
+  String[1] $owner                   = lookup('rspamd::ucl::file::owner', String, 'first', 'root'),
+  Variant[String[1], Integer] $group = lookup('rspamd::ucl::file::group', Variant[String, Integer], 'first', 0),
+  Stdlib::Filemode $mode             = lookup('rspamd::ucl::file::mode', Stdlib::Filemode, 'first', '0644'),
 ) {
   concat { $file:
-    owner => 'root',
+    owner => $owner,
     # Use '0' for compatibity with Linux ("root") and FreeBSD ("wheel")
-    group => 0,
-    mode  => '0644',
+    group => $group,
+    mode  => $mode,
     warn  => !$comment,
     order => 'alpha',
   }
