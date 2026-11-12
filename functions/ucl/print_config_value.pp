@@ -56,18 +56,10 @@ function rspamd::ucl::print_config_value($value, Rspamd::Ucl::ValueType $type = 
           }
           "<<${eod}\n${value}\n${eod}\n"
         }
-        $re_number, $re_boolean: {
-          # Make sure strings that look like numbers and booleans aren't printed verbatim
-          rspamd::ucl::quote_string_value($value)
-        }
-        /\A[A-Za-z0-9]+\z/: {
-          $value
-        }
-        String: {
-          rspamd::ucl::quote_string_value($value)
-        }
         default: {
-          # for everything else, convert to string, and then quote it
+          # Always quote explicitly typed strings.
+          # This prevents values such as YES, NO, ON and OFF
+          # from being interpreted as booleans by UCL.
           rspamd::ucl::quote_string_value(String($value))
         }
       }
